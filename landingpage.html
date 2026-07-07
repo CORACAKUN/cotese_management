@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORACA Tech Services | Business Management System</title>
+  <style>
+    :root {
+      --bg: #08090f;
+      --panel: #11131d;
+      --panel-strong: #171a25;
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #f4f7fb;
+      --muted: #aab3c5;
+      --cyan: #23d7ff;
+      --pink: #ff3db8;
+      --lime: #a9ff3f;
+      --amber: #ffbd38;
+      --danger: #ff5c7a;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(35, 215, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 61, 184, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at top left, rgba(35, 215, 255, 0.14), transparent 34rem),
+        linear-gradient(135deg, #08090f 0%, #121018 48%, #090d0b 100%);
+      background-size: 42px 42px, 42px 42px, auto, auto;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(8, 9, 15, 0.82);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 76px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(35, 215, 255, 0.5);
+      border-radius: var(--radius);
+      color: var(--cyan);
+      background: linear-gradient(145deg, rgba(35, 215, 255, 0.14), rgba(255, 61, 184, 0.12));
+      box-shadow: 0 0 22px rgba(35, 215, 255, 0.18);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .brand-name {
+      display: grid;
+      gap: 2px;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+
+    .brand-name span:last-child {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-actions,
+    .hero-actions,
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(35, 215, 255, 0.5);
+      background: rgba(35, 215, 255, 0.08);
+    }
+
+    .btn-primary {
+      border-color: rgba(35, 215, 255, 0.78);
+      color: #061014;
+      background: linear-gradient(135deg, var(--cyan), var(--lime));
+      box-shadow: 0 0 28px rgba(35, 215, 255, 0.22);
+      font-weight: 800;
+    }
+
+    .btn-primary:hover {
+      color: #061014;
+      background: linear-gradient(135deg, #6be7ff, #c9ff75);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+      gap: 52px;
+      align-items: center;
+      padding: 72px 0 48px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 189, 56, 0.35);
+      border-radius: 999px;
+      color: #ffe1a3;
+      background: rgba(255, 189, 56, 0.08);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin-bottom: 20px;
+      font-size: clamp(2.5rem, 7vw, 5.7rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .accent {
+      color: var(--cyan);
+      text-shadow: 0 0 24px rgba(35, 215, 255, 0.25);
+    }
+
+    .hero-copy {
+      max-width: 650px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.75;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+      font-size: 1.35rem;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .preview {
+      position: relative;
+      border: 1px solid rgba(35, 215, 255, 0.24);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .preview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(35, 215, 255, 0.1), transparent);
+      transform: translateX(-100%);
+      animation: scan 4.2s linear infinite;
+    }
+
+    @keyframes scan {
+      to {
+        transform: translateX(100%);
+      }
+    }
+
+    .preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .window-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    .window-dots span:nth-child(2) {
+      background: var(--amber);
+    }
+
+    .window-dots span:nth-child(3) {
+      background: var(--lime);
+    }
+
+    .status-pill {
+      padding: 6px 10px;
+      border: 1px solid rgba(169, 255, 63, 0.34);
+      border-radius: 999px;
+      color: var(--lime);
+      background: rgba(169, 255, 63, 0.08);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .image-placeholder {
+      display: grid;
+      place-items: center;
+      min-height: 250px;
+      margin: 16px 0;
+      border: 1px dashed rgba(35, 215, 255, 0.55);
+      border-radius: var(--radius);
+      color: var(--muted);
+      background:
+        linear-gradient(135deg, rgba(35, 215, 255, 0.12), transparent 42%),
+        linear-gradient(315deg, rgba(255, 61, 184, 0.12), transparent 40%),
+        rgba(255, 255, 255, 0.035);
+      text-align: center;
+    }
+
+    .image-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 1.12rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mini-panel {
+      min-height: 92px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: rgba(8, 9, 15, 0.62);
+    }
+
+    .mini-panel small {
+      color: var(--muted);
+    }
+
+    .mini-panel strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.45rem;
+    }
+
+    .bar {
+      height: 8px;
+      margin-top: 16px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--cyan), var(--pink), var(--amber));
+    }
+
+    section {
+      padding: 54px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-head h2 {
+      max-width: 680px;
+      margin-bottom: 0;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      max-width: 440px;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.045);
+      min-height: 190px;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(35, 215, 255, 0.45);
+      background: rgba(35, 215, 255, 0.055);
+    }
+
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      margin-bottom: 18px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--cyan);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 900;
+    }
+
+    .feature-card:nth-child(2) .feature-icon,
+    .feature-card:nth-child(6) .feature-icon {
+      color: var(--pink);
+    }
+
+    .feature-card:nth-child(3) .feature-icon,
+    .feature-card:nth-child(7) .feature-icon {
+      color: var(--lime);
+    }
+
+    .feature-card:nth-child(4) .feature-icon,
+    .feature-card:nth-child(8) .feature-icon {
+      color: var(--amber);
+    }
+
+    .feature-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+    }
+
+    .feature-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.94rem;
+    }
+
+    .access {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .access-panel,
+    .auth-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.045);
+      box-shadow: var(--shadow);
+    }
+
+    .access-panel {
+      padding: 30px;
+    }
+
+    .access-panel h2 {
+      margin-bottom: 14px;
+      font-size: clamp(1.9rem, 4vw, 3.3rem);
+      line-height: 1.05;
+    }
+
+    .access-panel p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .access-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .access-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(8, 9, 15, 0.42);
+      color: var(--muted);
+    }
+
+    .access-item span {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius);
+      color: #061014;
+      background: var(--lime);
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .auth-panel {
+      padding: 22px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tabs a {
+      display: grid;
+      place-items: center;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 800;
+    }
+
+    .auth-tabs a:first-child {
+      border-color: rgba(35, 215, 255, 0.56);
+      color: var(--text);
+      background: rgba(35, 215, 255, 0.1);
+    }
+
+    .forms {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: rgba(8, 9, 15, 0.46);
+    }
+
+    .form-box h3 {
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(35, 215, 255, 0.13);
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      padding: 26px 0;
+      color: var(--muted);
+    }
+
+    .footer .page-shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .nav {
+        flex-wrap: wrap;
+        padding: 14px 0;
+      }
+
+      .nav-links {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .hero,
+      .access {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .nav-actions,
+      .hero-actions,
+      .form-actions {
+        width: 100%;
+      }
+
+      .nav-actions .btn,
+      .hero-actions .btn,
+      .form-actions .btn {
+        flex: 1 1 150px;
+      }
+
+      .hero {
+        padding-top: 42px;
+      }
+
+      .hero-metrics,
+      .dashboard-grid,
+      .feature-grid,
+      .forms {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head p {
+        margin-top: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="page-shell nav" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="CORACA Tech Services home">
+        <span class="brand-mark">CT</span>
+        <span class="brand-name">
+          <span>CORACA Tech Services</span>
+          <span>Management Command Center</span>
+        </span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#modules">Modules</a>
+        <a href="#preview">Preview</a>
+        <a href="#access">Access</a>
+      </div>
+
+      <div class="nav-actions">
+        <a class="btn" href="#signin">Sign in</a>
+        <a class="btn btn-primary" href="#signup">Sign up</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="page-shell hero" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow">Repair shop operations, secured</div>
+        <h1 id="hero-title">Modern cyber dashboard for <span class="accent">sales, repairs, inventory</span>.</h1>
+        <p class="hero-copy">
+          Run CORACA Tech Services from one sharp command center: POS transactions, repair tickets, customers, suppliers, tools, employees, expenses, and reports built for fast daily work.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#signup">Create account</a>
+          <a class="btn" href="#preview">View preview</a>
+        </div>
+
+        <div class="hero-metrics" aria-label="Business system highlights">
+          <div class="metric">
+            <strong>12+</strong>
+            <span>Core business modules</span>
+          </div>
+          <div class="metric">
+            <strong>24/7</strong>
+            <span>Cloud-ready operations</span>
+          </div>
+          <div class="metric">
+            <strong>100%</strong>
+            <span>Mobile responsive layout</span>
+          </div>
+        </div>
+      </div>
+
+      <aside id="preview" class="preview" aria-label="Dashboard image placeholder">
+        <div class="preview-top">
+          <div class="window-dots" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span class="status-pill">SYSTEM ONLINE</span>
+        </div>
+
+        <div class="image-placeholder">
+          <div>
+            <strong>Image Placeholder</strong>
+            <span>Add your dashboard, shop, product, or team image here.</span>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="mini-panel">
+            <small>Today's Sales</small>
+            <strong>PHP 18,450</strong>
+            <div class="bar"></div>
+          </div>
+          <div class="mini-panel">
+            <small>Pending Repairs</small>
+            <strong>14</strong>
+            <div class="bar"></div>
+          </div>
+          <div class="mini-panel">
+            <small>Low Stocks</small>
+            <strong>7</strong>
+            <div class="bar"></div>
+          </div>
+          <div class="mini-panel">
+            <small>Inventory Value</small>
+            <strong>PHP 642K</strong>
+            <div class="bar"></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="modules" class="page-shell" aria-labelledby="modules-title">
+      <div class="section-head">
+        <h2 id="modules-title">Everything your tech service business needs in one interface.</h2>
+        <p>Designed for repair centers that need speed at the counter, clean tracking in the workshop, and clear numbers for management.</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon">POS</div>
+          <h3>Sales and Receipts</h3>
+          <p>Sell products, apply discounts, accept cash, GCash, bank transfer, split payments, and generate receipts.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">REP</div>
+          <h3>Repair Tickets</h3>
+          <p>Track devices from received, diagnosis, repair, testing, ready, released, cancelled, or warranty stages.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">INV</div>
+          <h3>Inventory Control</h3>
+          <p>Manage stock in, stock out, barcodes, SKU, product images, alerts, history, audits, and inventory value.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">CUS</div>
+          <h3>Customers</h3>
+          <p>Store customer profiles, devices, repair history, purchase records, warranty details, notes, and contacts.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">SUP</div>
+          <h3>Suppliers and Purchases</h3>
+          <p>Organize supplier records, purchase orders, invoices, received items, and outstanding balances.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">TLS</div>
+          <h3>Tools and Assets</h3>
+          <p>Monitor tools by condition, assignment, status, borrow history, maintenance, location, and image.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">EMP</div>
+          <h3>Employees</h3>
+          <p>Manage roles, permissions, attendance, salary, commission, performance, and activity logs.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">RPT</div>
+          <h3>Reports</h3>
+          <p>Review sales, profit, expenses, repair counts, top products, technicians, growth, and exports.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="access" class="page-shell access" aria-labelledby="access-title">
+      <div class="access-panel">
+        <h2 id="access-title">Secure access for owners, cashiers, technicians, and staff.</h2>
+        <p>
+          Start with authenticated accounts and role-based workflows. Keep daily operations focused while protecting settings, reports, and sensitive business data.
+        </p>
+
+        <div class="access-list">
+          <div class="access-item"><span>1</span>Owner and manager controls</div>
+          <div class="access-item"><span>2</span>Cashier and technician workspaces</div>
+          <div class="access-item"><span>3</span>Dark mode, notifications, backups, and cloud sync ready</div>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-tabs" aria-label="Authentication actions">
+          <a href="#signin">Sign in</a>
+          <a href="#signup">Sign up</a>
+        </div>
+
+        <div class="forms">
+          <form id="signin" class="form-box">
+            <h3>Sign in</h3>
+            <div class="field">
+              <label for="signin-email">Email address</label>
+              <input id="signin-email" type="email" placeholder="owner@coracatech.com" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="signin-password">Password</label>
+              <input id="signin-password" type="password" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary full" type="button">Sign in</button>
+            </div>
+          </form>
+
+          <form id="signup" class="form-box">
+            <h3>Sign up</h3>
+            <div class="field">
+              <label for="signup-name">Full name</label>
+              <input id="signup-name" type="text" placeholder="Your name" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="signup-email">Email address</label>
+              <input id="signup-email" type="email" placeholder="you@business.com" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="signup-password">Password</label>
+              <input id="signup-password" type="password" placeholder="Create password" autocomplete="new-password">
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary full" type="button">Create account</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="page-shell">
+      <span>© 2026 CORACA Tech Services. Business management system concept.</span>
+      <span>Sales • Repairs • Inventory • Reports</span>
+    </div>
+  </footer>
+</body>
+</html>
