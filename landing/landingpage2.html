@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CORACA Tech Services — Repair, Development &amp; IoT</title>
+<title>CTRL+FIX — Tech Repair, Dev &amp; Diagnostics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -90,15 +90,6 @@
     font-size:19px;
     letter-spacing:.03em;
     display:flex;align-items:center;gap:2px;
-  }
-  .logo .brand-tag{
-    font-family:var(--font-mono);
-    font-weight:500;
-    font-size:10px;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    color:var(--text-dim);
-    margin-left:9px;
   }
   .logo .plus{color:var(--magenta);}
   .logo .blink{
@@ -325,7 +316,6 @@
   }
   .img-slot{
     aspect-ratio:1;
-    max-height:260px;
     border:1px dashed var(--border-strong);
     border-radius:4px;
     display:flex;
@@ -340,7 +330,6 @@
       linear-gradient(135deg, transparent 48%, rgba(47,227,255,0.06) 50%, transparent 52%),
       var(--bg-elev-2);
     transition:border-color .2s, color .2s;
-    overflow:hidden;
   }
   .img-slot:hover{border-color:var(--cyan);color:var(--cyan);}
   .img-slot .plus-icon{
@@ -350,7 +339,7 @@
     display:flex;align-items:center;justify-content:center;
     font-size:16px;
   }
-  .img-slot.wide{grid-column:span 2;aspect-ratio:21/9;max-height:260px;}
+  .img-slot.wide{grid-column:span 2;}
 
   /* ===== FEED / POSTS ===== */
   .feed-header{
@@ -544,7 +533,7 @@
 <!-- NAV -->
 <nav class="navbar">
   <div class="wrap">
-    <a href="#home" class="logo">CORACA<span class="blink">●</span><span class="brand-tag">Tech Services</span></a>
+    <a href="#home" class="logo">CTRL<span class="plus">+</span>FIX<span class="blink">●</span></a>
     <ul class="nav-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#gallery">Gallery</a></li>
@@ -563,7 +552,7 @@
 <header class="hero" id="home">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">Bulan, Sorsogon · Mobile · Laptop · Software · IoT</div>
+      <div class="eyebrow">Naga City · Mobile · Laptop · Software</div>
       <h1>
         <span class="glitch" data-text="We diagnose it.">We diagnose it.</span><br>
         <span class="accent">We fix it. We build it.</span>
@@ -597,8 +586,7 @@
       <button class="tab-btn active" data-tab="mobile">01 · Mobile Repair</button>
       <button class="tab-btn" data-tab="computer">02 · Computer &amp; Laptop</button>
       <button class="tab-btn" data-tab="dev">03 · Software Development</button>
-      <button class="tab-btn" data-tab="iot">04 · Microcontrollers &amp; IoT</button>
-      <button class="tab-btn" data-tab="retail">05 · Accessories &amp; Retail</button>
+      <button class="tab-btn" data-tab="retail">04 · Accessories &amp; Retail</button>
     </div>
 
     <div class="tab-panel active" data-panel="mobile">
@@ -664,24 +652,6 @@
         <div class="service-card"><span class="dot"></span>Network Setup</div>
         <div class="service-card"><span class="dot"></span>Printer Setup</div>
         <div class="service-card"><span class="dot"></span>Software Troubleshooting</div>
-        <div class="service-card"><span class="dot"></span>Custom Web Server</div>
-      </div>
-    </div>
-
-    <div class="tab-panel" data-panel="iot">
-      <div class="service-grid">
-        <div class="service-card"><span class="dot"></span>ESP32 Programming</div>
-        <div class="service-card"><span class="dot"></span>Arduino Programming</div>
-        <div class="service-card"><span class="dot"></span>Sensor Integration</div>
-        <div class="service-card"><span class="dot"></span>IoT Prototyping</div>
-        <div class="service-card"><span class="dot"></span>Home Automation Setup</div>
-        <div class="service-card"><span class="dot"></span>Wi-Fi / Bluetooth Module Setup</div>
-        <div class="service-card"><span class="dot"></span>Circuit Design &amp; Testing</div>
-        <div class="service-card"><span class="dot"></span>PCB Soldering &amp; Rework</div>
-        <div class="service-card"><span class="dot"></span>Robotics Projects</div>
-        <div class="service-card"><span class="dot"></span>Microcontroller Repair &amp; Debugging</div>
-        <div class="service-card"><span class="dot"></span>Firmware Flashing</div>
-        <div class="service-card"><span class="dot"></span>School / Capstone Projects</div>
       </div>
     </div>
 
@@ -754,8 +724,8 @@
   <div class="wrap">
     <div class="footer-grid">
       <div>
-        <a href="#home" class="logo">CORACA<span class="blink">●</span></a>
-        <p style="margin-top:14px;max-width:260px;">Mobile, laptop, and system repair — plus custom software and microcontroller builds, done locally.</p>
+        <a href="#home" class="logo">CTRL<span class="plus">+</span>FIX</a>
+        <p style="margin-top:14px;max-width:260px;">Mobile, laptop, and system repair — plus custom software builds, done locally.</p>
       </div>
       <div>
         <h4>Services</h4>
@@ -763,7 +733,6 @@
           <li><a href="#services">Mobile Repair</a></li>
           <li><a href="#services">Computer &amp; Laptop</a></li>
           <li><a href="#services">Software Dev</a></li>
-          <li><a href="#services">Microcontrollers &amp; IoT</a></li>
           <li><a href="#services">Accessories</a></li>
         </ul>
       </div>
@@ -784,8 +753,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 CORACA Tech Services. All systems operational.</span>
-      <span>San Francisco, Bulan, Sorsogon, PH</span>
+      <span>© 2026 CTRL+FIX. All systems operational.</span>
+      <span>Naga City, Bicol Region, PH</span>
     </div>
   </div>
 </footer>
