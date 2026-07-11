@@ -54,10 +54,78 @@
       </header>
 
       <section class="tab-panel active" data-panel="dashboard">
-        <div class="placeholder">
-          <p class="label">Overview</p>
-          <h2>Dashboard placeholder</h2>
-          <p>Summary cards, open repair counts, recent activity, and business metrics will go here.</p>
+        <div class="dashboard-layout">
+          <section class="summary-grid" aria-label="Dashboard summary">
+            <article class="summary-card">
+              <span>Open repairs</span>
+              <strong id="dashboardOpenRepairs">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Ready for pickup</span>
+              <strong id="dashboardReadyRepairs">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Collected revenue</span>
+              <strong id="dashboardRevenue">PHP 0.00</strong>
+            </article>
+            <article class="summary-card">
+              <span>Unpaid balance</span>
+              <strong id="dashboardBalance">PHP 0.00</strong>
+            </article>
+          </section>
+
+          <div class="dashboard-grid">
+            <section class="repair-list" aria-labelledby="dashboardQueueTitle">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Today focus</p>
+                  <h2 id="dashboardQueueTitle">Priority queue</h2>
+                </div>
+                <button class="secondary-button" type="button" data-jump-tab="repairs">View all</button>
+              </div>
+              <div class="mini-list" id="dashboardPriorityList">
+                <p class="empty-state">Loading priority repairs...</p>
+              </div>
+            </section>
+
+            <section class="repair-list" aria-labelledby="dashboardStatusTitle">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Workflow</p>
+                  <h2 id="dashboardStatusTitle">Repair status</h2>
+                </div>
+              </div>
+              <div class="status-stack" id="dashboardStatusBreakdown"></div>
+            </section>
+          </div>
+
+          <section class="repair-list" aria-labelledby="dashboardRecentTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Recent activity</p>
+                <h2 id="dashboardRecentTitle">Latest repairs</h2>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Customer</th>
+                    <th>Device</th>
+                    <th>Status</th>
+                    <th>Balance</th>
+                    <th>Updated</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardRecentTable">
+                  <tr>
+                    <td colspan="6">Loading recent repairs...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </section>
 
@@ -319,18 +387,148 @@
       </section>
 
       <section class="tab-panel" data-panel="customers">
-        <div class="placeholder">
-          <p class="label">Customer records</p>
-          <h2>Customers placeholder</h2>
-          <p>Customer profiles, contact details, and service history will go here.</p>
+        <div class="customer-layout">
+          <div class="repair-toolbar">
+            <div>
+              <p class="eyebrow">Customer records</p>
+              <h2>Customers</h2>
+            </div>
+            <input class="search-input" id="customerSearch" type="search" placeholder="Search customers">
+          </div>
+
+          <section class="summary-grid" aria-label="Customer summary">
+            <article class="summary-card">
+              <span>Total customers</span>
+              <strong id="totalCustomers">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Active customers</span>
+              <strong id="activeCustomers">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Repeat customers</span>
+              <strong id="repeatCustomers">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Unpaid balance</span>
+              <strong id="customerBalance">₱0.00</strong>
+            </article>
+          </section>
+
+          <section class="repair-list" aria-labelledby="customerListTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Directory</p>
+                <h2 id="customerListTitle">Customer list</h2>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="customer-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Contact</th>
+                    <th>Repairs</th>
+                    <th>Active ticket</th>
+                    <th>Total spent</th>
+                    <th>Balance</th>
+                    <th>Last visit</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                  <tr>
+                    <td colspan="8">Loading customers...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </section>
 
       <section class="tab-panel" data-panel="reports">
-        <div class="placeholder">
-          <p class="label">Business reports</p>
-          <h2>Reports placeholder</h2>
-          <p>Revenue summaries, completed repairs, inventory movement, and export tools will go here.</p>
+        <div class="reports-layout">
+          <div class="repair-toolbar">
+            <div>
+              <p class="eyebrow">Business reports</p>
+              <h2>Reports</h2>
+            </div>
+            <select class="search-input" id="reportPeriod" aria-label="Report period">
+              <option value="all">All time</option>
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="month">This month</option>
+            </select>
+          </div>
+
+          <section class="summary-grid" aria-label="Report summary">
+            <article class="summary-card">
+              <span>Tickets</span>
+              <strong id="reportTickets">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Completed</span>
+              <strong id="reportCompleted">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Revenue</span>
+              <strong id="reportRevenue">PHP 0.00</strong>
+            </article>
+            <article class="summary-card">
+              <span>Outstanding</span>
+              <strong id="reportOutstanding">PHP 0.00</strong>
+            </article>
+          </section>
+
+          <div class="dashboard-grid">
+            <section class="repair-list" aria-labelledby="reportStatusTitle">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Status</p>
+                  <h2 id="reportStatusTitle">Tickets by status</h2>
+                </div>
+              </div>
+              <div class="status-stack" id="reportStatusBreakdown"></div>
+            </section>
+
+            <section class="repair-list" aria-labelledby="reportPaymentTitle">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Payment</p>
+                  <h2 id="reportPaymentTitle">Payment status</h2>
+                </div>
+              </div>
+              <div class="status-stack" id="reportPaymentBreakdown"></div>
+            </section>
+          </div>
+
+          <section class="repair-list" aria-labelledby="reportServiceTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Services</p>
+                <h2 id="reportServiceTitle">Top service types</h2>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Tickets</th>
+                    <th>Revenue</th>
+                    <th>Outstanding</th>
+                  </tr>
+                </thead>
+                <tbody id="reportServicesTable">
+                  <tr>
+                    <td colspan="4">Loading service report...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </section>
     </section>
