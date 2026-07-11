@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORACA Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="auth-screen" id="authScreen">
+    <section class="login-panel" aria-labelledby="loginTitle">
+      <div class="brand-mark">CORACA</div>
+      <h1 id="loginTitle">Admin sign in</h1>
+      <p>Use your Firebase admin account to access the dashboard.</p>
+
+      <form id="loginForm" class="login-form">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+        <button type="submit" id="loginButton">Sign in</button>
+        <p class="form-message" id="authMessage" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <main class="admin-shell hidden" id="adminShell">
+    <aside class="sidebar" aria-label="Admin navigation">
+      <a class="sidebar-brand" href="./">CORACA<span>Admin</span></a>
+      <nav class="admin-tabs" role="tablist" aria-label="Dashboard sections">
+        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="dashboard">Dashboard</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="repairs">Repairs</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="customers">Customers</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="reports">Reports</button>
+      </nav>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">Menu</button>
+        <div>
+          <p class="eyebrow">Admin dashboard</p>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <div class="account">
+          <span id="userEmail">Signed in</span>
+          <button type="button" id="logoutButton">Sign out</button>
+        </div>
+      </header>
+
+      <section class="tab-panel active" data-panel="dashboard">
+        <div class="placeholder">
+          <p class="label">Overview</p>
+          <h2>Dashboard placeholder</h2>
+          <p>Summary cards, open repair counts, recent activity, and business metrics will go here.</p>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="repairs">
+        <div class="repair-layout">
+          <div class="repair-toolbar">
+            <div>
+              <p class="eyebrow">Repair queue</p>
+              <h2>Repair tickets</h2>
+            </div>
+            <button type="button" id="showRepairFormButton">New repair</button>
+          </div>
+
+          <form class="repair-form hidden" id="repairForm">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Repair intake</p>
+                <h2 id="repairFormTitle">New repair ticket</h2>
+              </div>
+              <button class="secondary-button" type="button" id="cancelEditButton">Close form</button>
+            </div>
+
+            <input type="hidden" id="repairId" name="repairId">
+
+            <fieldset>
+              <legend>Customer</legend>
+              <div class="form-grid">
+                <label>
+                  Customer name
+                  <input name="customerName" type="text" autocomplete="name" required>
+                </label>
+                <label>
+                  Phone number
+                  <input name="customerPhone" type="tel" autocomplete="tel">
+                </label>
+                <label>
+                  Email
+                  <input name="customerEmail" type="email" autocomplete="email">
+                </label>
+                <label>
+                  Address
+                  <input name="customerAddress" type="text" autocomplete="street-address">
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Device</legend>
+              <div class="form-grid">
+                <label>
+                  Device type
+                  <select name="deviceType" required>
+                    <option value="">Select type</option>
+                    <option>Cellphone</option>
+                    <option>Laptop</option>
+                    <option>Desktop</option>
+                    <option>Tablet</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>
+                  Brand
+                  <input name="deviceBrand" type="text" required>
+                </label>
+                <label>
+                  Model
+                  <input name="deviceModel" type="text" required>
+                </label>
+                <label>
+                  Serial / IMEI
+                  <input name="serialOrImei" type="text">
+                </label>
+                <label>
+                  Device password / PIN
+                  <input name="devicePassword" type="text" autocomplete="off">
+                </label>
+                <label>
+                  Accessories received
+                  <input name="accessories" type="text" placeholder="Charger, case, adapter">
+                </label>
+              </div>
+              <label>
+                Intake condition
+                <textarea name="condition" rows="2" placeholder="Cracks, scratches, water damage, no power, missing screws"></textarea>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Repair details</legend>
+              <div class="form-grid">
+                <label>
+                  Repair category
+                  <select name="repairCategory" required>
+                    <option value="">Select category</option>
+                    <option>Hardware</option>
+                    <option>Software</option>
+                    <option>Hardware + Software</option>
+                  </select>
+                </label>
+                <label>
+                  Service type
+                  <select name="serviceType">
+                    <option value="">Select service</option>
+                    <option>LCD / Display Replacement</option>
+                    <option>Battery Replacement</option>
+                    <option>Charging Port Repair</option>
+                    <option>Speaker / Microphone Repair</option>
+                    <option>Camera Replacement</option>
+                    <option>Button Repair</option>
+                    <option>Water Damage Cleaning</option>
+                    <option>No Power / No Display Diagnosis</option>
+                    <option>OS Installation / Formatting</option>
+                    <option>Software Update / Flashing</option>
+                    <option>Bootloop Fix</option>
+                    <option>FRP / Account Recovery</option>
+                    <option>Password Recovery</option>
+                    <option>Virus Removal</option>
+                    <option>Driver / Software Installation</option>
+                    <option>Data Backup / Recovery</option>
+                    <option>RAM / SSD Upgrade</option>
+                    <option>Keyboard / Hinges Repair</option>
+                    <option>Fan Cleaning / Thermal Paste</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>
+                  Priority
+                  <select name="priority">
+                    <option>Normal</option>
+                    <option>Rush</option>
+                    <option>Warranty</option>
+                  </select>
+                </label>
+                <label>
+                  Status
+                  <select name="status" required>
+                    <option>Received</option>
+                    <option>Diagnosing</option>
+                    <option>Waiting for Approval</option>
+                    <option>Waiting for Parts</option>
+                    <option>In Progress</option>
+                    <option>Ready for Pickup</option>
+                    <option>Completed</option>
+                    <option>Cancelled</option>
+                  </select>
+                </label>
+                <label>
+                  Assigned technician
+                  <input name="assignedTechnician" type="text">
+                </label>
+                <label>
+                  Estimated completion
+                  <input name="estimatedCompletion" type="date">
+                </label>
+              </div>
+              <label>
+                Customer reported issue
+                <textarea name="reportedIssue" rows="2" required></textarea>
+              </label>
+              <label>
+                Technician diagnosis
+                <textarea name="diagnosis" rows="2"></textarea>
+              </label>
+              <label>
+                Notes
+                <textarea name="notes" rows="2"></textarea>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Pricing and payment</legend>
+              <div class="form-grid">
+                <label>
+                  Diagnostic fee
+                  <input name="diagnosticFee" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Parts cost
+                  <input name="partsCost" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Labor cost
+                  <input name="laborCost" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Discount
+                  <input name="discount" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Final total
+                  <input name="finalTotal" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Amount paid
+                  <input name="amountPaid" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Payment status
+                  <select name="paymentStatus">
+                    <option>Unpaid</option>
+                    <option>Partial</option>
+                    <option>Paid</option>
+                  </select>
+                </label>
+                <label>
+                  Payment method
+                  <select name="paymentMethod">
+                    <option value="">Select method</option>
+                    <option>Cash</option>
+                    <option>GCash</option>
+                    <option>Bank Transfer</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>
+                  Warranty until
+                  <input name="warrantyUntil" type="date">
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" id="saveRepairButton">Save repair</button>
+              <p class="form-message" id="repairMessage" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+
+          <section class="repair-list" aria-labelledby="repairListTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Repair queue</p>
+                <h2 id="repairListTitle">Repair tickets</h2>
+              </div>
+              <input class="search-input" id="repairSearch" type="search" placeholder="Search tickets">
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Customer</th>
+                    <th>Device</th>
+                    <th>Issue</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="repairsTableBody">
+                  <tr>
+                    <td colspan="7">Loading repairs...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="customers">
+        <div class="placeholder">
+          <p class="label">Customer records</p>
+          <h2>Customers placeholder</h2>
+          <p>Customer profiles, contact details, and service history will go here.</p>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="reports">
+        <div class="placeholder">
+          <p class="label">Business reports</p>
+          <h2>Reports placeholder</h2>
+          <p>Revenue summaries, completed repairs, inventory movement, and export tools will go here.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+  <script type="module" src="./repairs-crud.js"></script>
+</body>
+</html>
