@@ -20,6 +20,8 @@ const tabPanels = document.querySelectorAll(".tab-panel");
 const titles = {
   dashboard: "Dashboard",
   repairs: "Repairs",
+  stocks: "Stocks",
+  expenses: "Expenses",
   customers: "Customers",
   reports: "Reports"
 };

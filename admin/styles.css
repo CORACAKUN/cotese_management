@@ -107,7 +107,9 @@ button {
 .repair-layout,
 .customer-layout,
 .dashboard-layout,
-.reports-layout {
+.reports-layout,
+.stock-layout,
+.expenses-layout {
   display: grid;
   gap: 22px;
 }
@@ -140,6 +142,13 @@ button {
 
 .repair-toolbar button:hover {
   background: var(--accent-dark);
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .summary-grid {
@@ -388,6 +397,10 @@ table {
   min-width: 1040px;
 }
 
+.stock-table {
+  min-width: 1080px;
+}
+
 th,
 td {
   border-bottom: 1px solid var(--line);
@@ -421,6 +434,10 @@ td span {
   color: #075985;
   font-weight: 800;
   padding: 5px 9px;
+}
+
+.danger-text {
+  color: var(--danger);
 }
 
 .row-actions {
@@ -720,8 +737,13 @@ td span {
     padding: 18px;
   }
 
-  .repair-toolbar button {
+  .repair-toolbar button,
+  .toolbar-actions {
     width: 100%;
+  }
+
+  .toolbar-actions {
+    display: grid;
   }
 
   .account {
