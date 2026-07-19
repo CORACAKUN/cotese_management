@@ -35,6 +35,8 @@
       <nav class="admin-tabs" role="tablist" aria-label="Dashboard sections">
         <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="dashboard">Dashboard</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="repairs">Repairs</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="stocks">Stocks</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="expenses">Expenses</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="customers">Customers</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="reports">Reports</button>
       </nav>
@@ -378,6 +380,365 @@
                 <tbody id="repairsTableBody">
                   <tr>
                     <td colspan="7">Loading repairs...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="stocks">
+        <div class="stock-layout">
+          <div class="repair-toolbar">
+            <div>
+              <p class="eyebrow">Inventory</p>
+              <h2>Stocks</h2>
+            </div>
+            <button type="button" id="showStockFormButton">New stock item</button>
+          </div>
+
+          <section class="summary-grid" aria-label="Stock summary">
+            <article class="summary-card">
+              <span>Stock items</span>
+              <strong id="stockItemCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Total units</span>
+              <strong id="stockUnitCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Inventory cost</span>
+              <strong id="stockCostValue">PHP 0.00</strong>
+            </article>
+            <article class="summary-card">
+              <span>Low stock</span>
+              <strong id="lowStockCount">0</strong>
+            </article>
+          </section>
+
+          <form class="repair-form hidden" id="stockForm">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Stock item</p>
+                <h2 id="stockFormTitle">New stock item</h2>
+              </div>
+              <button class="secondary-button" type="button" id="cancelStockEditButton">Close form</button>
+            </div>
+
+            <input type="hidden" id="stockId" name="stockId">
+
+            <fieldset>
+              <legend>Item details</legend>
+              <div class="form-grid">
+                <label>
+                  Item name
+                  <input name="itemName" type="text" required>
+                </label>
+                <label>
+                  Category
+                  <select name="category" required>
+                    <option value="">Select category</option>
+                    <option>Power / Volume Button Flex</option>
+                    <option>Outer Buttons</option>
+                    <option>Tempered Glass</option>
+                    <option>Case</option>
+                    <option>Battery</option>
+                    <option>LCD</option>
+                    <option>Charging Port</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>
+                  SKU / Code
+                  <input name="sku" type="text">
+                </label>
+                <label>
+                  Quantity
+                  <input name="quantity" type="number" min="0" step="1" value="0" required>
+                </label>
+                <label>
+                  Reorder level
+                  <input name="reorderLevel" type="number" min="0" step="1" value="0">
+                </label>
+                <label>
+                  Unit cost
+                  <input name="unitCost" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Selling price
+                  <input name="sellingPrice" type="number" min="0" step="0.01" value="0">
+                </label>
+                <label>
+                  Supplier
+                  <input name="supplier" type="text">
+                </label>
+                <label>
+                  Compatible model
+                  <input name="compatibleModel" type="text" placeholder="iPhone 11, A12, universal">
+                </label>
+              </div>
+              <label>
+                Notes
+                <textarea name="notes" rows="2"></textarea>
+              </label>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" id="saveStockButton">Save stock item</button>
+              <p class="form-message" id="stockMessage" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+
+          <section class="repair-list" aria-labelledby="stockListTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Stock list</p>
+                <h2 id="stockListTitle">Inventory items</h2>
+              </div>
+              <input class="search-input" id="stockSearch" type="search" placeholder="Search stocks">
+            </div>
+
+            <div class="table-wrap">
+              <table class="stock-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Qty</th>
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Supplier</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="stocksTableBody">
+                  <tr>
+                    <td colspan="8">Loading stocks...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="expenses">
+        <div class="expenses-layout">
+          <div class="repair-toolbar">
+            <div>
+              <p class="eyebrow">Operating costs</p>
+              <h2>Expenses</h2>
+            </div>
+            <div class="toolbar-actions">
+              <button type="button" id="showExpenseFormButton">New expense</button>
+              <button type="button" id="showBillFormButton">New bill</button>
+            </div>
+          </div>
+
+          <section class="summary-grid" aria-label="Expense summary">
+            <article class="summary-card">
+              <span>Expenses</span>
+              <strong id="expenseCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Expense total</span>
+              <strong id="expenseTotal">PHP 0.00</strong>
+            </article>
+            <article class="summary-card">
+              <span>Monthly bills</span>
+              <strong id="billTotal">PHP 0.00</strong>
+            </article>
+            <article class="summary-card">
+              <span>Unpaid bills</span>
+              <strong id="unpaidBillCount">0</strong>
+            </article>
+          </section>
+
+          <form class="repair-form hidden" id="expenseForm">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Expense record</p>
+                <h2 id="expenseFormTitle">New expense</h2>
+              </div>
+              <button class="secondary-button" type="button" id="cancelExpenseEditButton">Close form</button>
+            </div>
+
+            <input type="hidden" id="expenseId" name="expenseId">
+
+            <fieldset>
+              <legend>Expense details</legend>
+              <div class="form-grid">
+                <label>
+                  Expense name
+                  <input name="expenseName" type="text" required>
+                </label>
+                <label>
+                  Category
+                  <select name="category" required>
+                    <option value="">Select category</option>
+                    <option>Buying Tools</option>
+                    <option>Consumable Tools</option>
+                    <option>Adhesive Glue</option>
+                    <option>Tarpaulin</option>
+                    <option>Signage</option>
+                    <option>Lighting Signage</option>
+                    <option>Software - UnlockTool</option>
+                    <option>Software</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>
+                  Amount
+                  <input name="amount" type="number" min="0" step="0.01" value="0" required>
+                </label>
+                <label>
+                  Date
+                  <input name="expenseDate" type="date">
+                </label>
+                <label>
+                  Vendor / Supplier
+                  <input name="vendor" type="text">
+                </label>
+                <label>
+                  Payment method
+                  <select name="paymentMethod">
+                    <option value="">Select method</option>
+                    <option>Cash</option>
+                    <option>GCash</option>
+                    <option>Bank Transfer</option>
+                    <option>Card</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                Notes
+                <textarea name="notes" rows="2"></textarea>
+              </label>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" id="saveExpenseButton">Save expense</button>
+              <p class="form-message" id="expenseMessage" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+
+          <form class="repair-form hidden" id="billForm">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Recurring bill</p>
+                <h2 id="billFormTitle">New rent, electricity, or wifi bill</h2>
+              </div>
+              <button class="secondary-button" type="button" id="cancelBillEditButton">Close form</button>
+            </div>
+
+            <input type="hidden" id="billId" name="billId">
+
+            <fieldset>
+              <legend>Bill details</legend>
+              <div class="form-grid">
+                <label>
+                  Bill type
+                  <select name="billType" required>
+                    <option>Rent</option>
+                    <option>Electricity</option>
+                    <option>Wifi</option>
+                  </select>
+                </label>
+                <label>
+                  Provider / Landlord
+                  <input name="provider" type="text">
+                </label>
+                <label>
+                  Amount
+                  <input name="amount" type="number" min="0" step="0.01" value="0" required>
+                </label>
+                <label>
+                  Due date
+                  <input name="dueDate" type="date">
+                </label>
+                <label>
+                  Paid date
+                  <input name="paidDate" type="date">
+                </label>
+                <label>
+                  Status
+                  <select name="status">
+                    <option>Unpaid</option>
+                    <option>Paid</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                Notes
+                <textarea name="notes" rows="2"></textarea>
+              </label>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" id="saveBillButton">Save bill</button>
+              <p class="form-message" id="billMessage" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+
+          <section class="repair-list" aria-labelledby="expenseListTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Expense list</p>
+                <h2 id="expenseListTitle">Tools, consumables, signage, and software</h2>
+              </div>
+              <input class="search-input" id="expenseSearch" type="search" placeholder="Search expenses">
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Expense</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Vendor</th>
+                    <th>Payment</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="expensesTableBody">
+                  <tr>
+                    <td colspan="7">Loading expenses...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="repair-list" aria-labelledby="billListTitle">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Fixed monthly costs</p>
+                <h2 id="billListTitle">Rent, electricity, and wifi</h2>
+              </div>
+              <input class="search-input" id="billSearch" type="search" placeholder="Search bills">
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bill</th>
+                    <th>Provider</th>
+                    <th>Amount</th>
+                    <th>Due date</th>
+                    <th>Paid date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="billsTableBody">
+                  <tr>
+                    <td colspan="7">Loading bills...</td>
                   </tr>
                 </tbody>
               </table>

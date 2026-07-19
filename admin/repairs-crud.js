@@ -13,6 +13,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const repairsCollection = collection(db, "repairs");
+const stocksCollection = collection(db, "stocks");
+const expensesCollection = collection(db, "expenses");
+const recurringBillsCollection = collection(db, "recurringBills");
 const repairForm = document.getElementById("repairForm");
 const repairId = document.getElementById("repairId");
 const repairFormTitle = document.getElementById("repairFormTitle");
@@ -43,9 +46,50 @@ const reportOutstanding = document.getElementById("reportOutstanding");
 const reportStatusBreakdown = document.getElementById("reportStatusBreakdown");
 const reportPaymentBreakdown = document.getElementById("reportPaymentBreakdown");
 const reportServicesTable = document.getElementById("reportServicesTable");
+const stockForm = document.getElementById("stockForm");
+const stockId = document.getElementById("stockId");
+const stockFormTitle = document.getElementById("stockFormTitle");
+const stockMessage = document.getElementById("stockMessage");
+const saveStockButton = document.getElementById("saveStockButton");
+const cancelStockEditButton = document.getElementById("cancelStockEditButton");
+const showStockFormButton = document.getElementById("showStockFormButton");
+const stocksTableBody = document.getElementById("stocksTableBody");
+const stockSearch = document.getElementById("stockSearch");
+const stockItemCount = document.getElementById("stockItemCount");
+const stockUnitCount = document.getElementById("stockUnitCount");
+const stockCostValue = document.getElementById("stockCostValue");
+const lowStockCount = document.getElementById("lowStockCount");
+const expenseForm = document.getElementById("expenseForm");
+const expenseId = document.getElementById("expenseId");
+const expenseFormTitle = document.getElementById("expenseFormTitle");
+const expenseMessage = document.getElementById("expenseMessage");
+const saveExpenseButton = document.getElementById("saveExpenseButton");
+const cancelExpenseEditButton = document.getElementById("cancelExpenseEditButton");
+const showExpenseFormButton = document.getElementById("showExpenseFormButton");
+const expensesTableBody = document.getElementById("expensesTableBody");
+const expenseSearch = document.getElementById("expenseSearch");
+const billForm = document.getElementById("billForm");
+const billId = document.getElementById("billId");
+const billFormTitle = document.getElementById("billFormTitle");
+const billMessage = document.getElementById("billMessage");
+const saveBillButton = document.getElementById("saveBillButton");
+const cancelBillEditButton = document.getElementById("cancelBillEditButton");
+const showBillFormButton = document.getElementById("showBillFormButton");
+const billsTableBody = document.getElementById("billsTableBody");
+const billSearch = document.getElementById("billSearch");
+const expenseCount = document.getElementById("expenseCount");
+const expenseTotal = document.getElementById("expenseTotal");
+const billTotal = document.getElementById("billTotal");
+const unpaidBillCount = document.getElementById("unpaidBillCount");
 
 let repairs = [];
+let stocks = [];
+let expenses = [];
+let recurringBills = [];
 let unsubscribeRepairs = null;
+let unsubscribeStocks = null;
+let unsubscribeExpenses = null;
+let unsubscribeRecurringBills = null;
 let currentUser = null;
 
 const moneyFormatter = new Intl.NumberFormat("en-PH", {
@@ -239,6 +283,369 @@ function buildRepairPayload(formData, existingTicketNo) {
 function setMessage(message, type = "error") {
   repairMessage.textContent = message;
   repairMessage.dataset.type = type;
+}
+
+function setScopedMessage(element, message, type = "error") {
+  element.textContent = message;
+  element.dataset.type = type;
+}
+
+function todayInputValue() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function showStockForm() {
+  stockForm.classList.remove("hidden");
+  showStockFormButton.classList.add("hidden");
+}
+
+function hideStockForm() {
+  stockForm.classList.add("hidden");
+  showStockFormButton.classList.remove("hidden");
+}
+
+function resetStockForm(options = {}) {
+  stockForm.reset();
+  stockId.value = "";
+  stockFormTitle.textContent = "New stock item";
+  saveStockButton.textContent = "Save stock item";
+  stockForm.elements.namedItem("quantity").value = "0";
+  stockForm.elements.namedItem("reorderLevel").value = "0";
+  stockForm.elements.namedItem("unitCost").value = "0";
+  stockForm.elements.namedItem("sellingPrice").value = "0";
+  setScopedMessage(stockMessage, "");
+
+  if (options.hide !== false) {
+    hideStockForm();
+  }
+}
+
+function buildStockPayload(formData) {
+  return {
+    itemName: textValue(formData, "itemName"),
+    category: textValue(formData, "category"),
+    sku: emptyToNull(textValue(formData, "sku")),
+    quantity: numberValue(formData, "quantity"),
+    reorderLevel: numberValue(formData, "reorderLevel"),
+    unitCost: numberValue(formData, "unitCost"),
+    sellingPrice: numberValue(formData, "sellingPrice"),
+    supplier: emptyToNull(textValue(formData, "supplier")),
+    compatibleModel: emptyToNull(textValue(formData, "compatibleModel")),
+    notes: emptyToNull(textValue(formData, "notes")),
+    updatedAt: serverTimestamp()
+  };
+}
+
+function fillStockForm(stock) {
+  showStockForm();
+  stockId.value = stock.id;
+  stockFormTitle.textContent = `Edit ${stock.itemName || "stock item"}`;
+  saveStockButton.textContent = "Update stock item";
+
+  [
+    "itemName",
+    "category",
+    "sku",
+    "quantity",
+    "reorderLevel",
+    "unitCost",
+    "sellingPrice",
+    "supplier",
+    "compatibleModel",
+    "notes"
+  ].forEach((name) => {
+    const field = stockForm.elements.namedItem(name);
+    if (field) {
+      field.value = stock[name] ?? "";
+    }
+  });
+
+  stockForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function getStockSearchText(stock) {
+  return [
+    stock.itemName,
+    stock.category,
+    stock.sku,
+    stock.supplier,
+    stock.compatibleModel,
+    stock.notes
+  ].join(" ").toLowerCase();
+}
+
+function renderStockSummary() {
+  const units = stocks.reduce((sum, stock) => sum + (stock.quantity || 0), 0);
+  const costValue = stocks.reduce((sum, stock) => {
+    return sum + ((stock.quantity || 0) * (stock.unitCost || 0));
+  }, 0);
+  const lowCount = stocks.filter((stock) => {
+    const reorderLevel = stock.reorderLevel || 0;
+    return reorderLevel > 0 && (stock.quantity || 0) <= reorderLevel;
+  }).length;
+
+  stockItemCount.textContent = String(stocks.length);
+  stockUnitCount.textContent = String(units);
+  stockCostValue.textContent = moneyFormatter.format(costValue);
+  lowStockCount.textContent = String(lowCount);
+}
+
+function renderStocks() {
+  const term = stockSearch.value.trim().toLowerCase();
+  const visibleStocks = term
+    ? stocks.filter((stock) => getStockSearchText(stock).includes(term))
+    : stocks;
+
+  renderStockSummary();
+
+  if (!visibleStocks.length) {
+    stocksTableBody.innerHTML = `
+      <tr>
+        <td colspan="8">${term ? "No matching stock items found." : "No stock items yet."}</td>
+      </tr>
+    `;
+    return;
+  }
+
+  stocksTableBody.innerHTML = visibleStocks.map((stock) => {
+    const isLow = (stock.reorderLevel || 0) > 0 && (stock.quantity || 0) <= (stock.reorderLevel || 0);
+
+    return `
+      <tr>
+        <td>
+          <strong>${escapeHtml(stock.itemName || "")}</strong>
+          <span>${escapeHtml(stock.sku || stock.compatibleModel || "No SKU")}</span>
+        </td>
+        <td>${escapeHtml(stock.category || "")}</td>
+        <td>
+          <strong class="${isLow ? "danger-text" : ""}">${stock.quantity || 0}</strong>
+          <span>Reorder at ${stock.reorderLevel || 0}</span>
+        </td>
+        <td>${moneyFormatter.format(stock.unitCost || 0)}</td>
+        <td>${moneyFormatter.format(stock.sellingPrice || 0)}</td>
+        <td>${escapeHtml(stock.supplier || "No supplier")}</td>
+        <td>${formatDate(stock.updatedAt || stock.createdAt)}</td>
+        <td>
+          <div class="row-actions">
+            <button type="button" data-action="edit-stock" data-id="${stock.id}">Edit</button>
+            <button type="button" data-action="delete-stock" data-id="${stock.id}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function showExpenseForm() {
+  expenseForm.classList.remove("hidden");
+  showExpenseFormButton.classList.add("hidden");
+}
+
+function hideExpenseForm() {
+  expenseForm.classList.add("hidden");
+  showExpenseFormButton.classList.remove("hidden");
+}
+
+function resetExpenseForm(options = {}) {
+  expenseForm.reset();
+  expenseId.value = "";
+  expenseFormTitle.textContent = "New expense";
+  saveExpenseButton.textContent = "Save expense";
+  expenseForm.elements.namedItem("amount").value = "0";
+  expenseForm.elements.namedItem("expenseDate").value = todayInputValue();
+  setScopedMessage(expenseMessage, "");
+
+  if (options.hide !== false) {
+    hideExpenseForm();
+  }
+}
+
+function buildExpensePayload(formData) {
+  return {
+    expenseName: textValue(formData, "expenseName"),
+    category: textValue(formData, "category"),
+    amount: numberValue(formData, "amount"),
+    expenseDate: emptyToNull(textValue(formData, "expenseDate")),
+    vendor: emptyToNull(textValue(formData, "vendor")),
+    paymentMethod: emptyToNull(textValue(formData, "paymentMethod")),
+    notes: emptyToNull(textValue(formData, "notes")),
+    updatedAt: serverTimestamp()
+  };
+}
+
+function fillExpenseForm(expense) {
+  showExpenseForm();
+  expenseId.value = expense.id;
+  expenseFormTitle.textContent = `Edit ${expense.expenseName || "expense"}`;
+  saveExpenseButton.textContent = "Update expense";
+
+  ["expenseName", "category", "amount", "expenseDate", "vendor", "paymentMethod", "notes"].forEach((name) => {
+    const field = expenseForm.elements.namedItem(name);
+    if (field) {
+      field.value = expense[name] ?? "";
+    }
+  });
+
+  expenseForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function getExpenseSearchText(expense) {
+  return [
+    expense.expenseName,
+    expense.category,
+    expense.vendor,
+    expense.paymentMethod,
+    expense.notes
+  ].join(" ").toLowerCase();
+}
+
+function showBillForm() {
+  billForm.classList.remove("hidden");
+  showBillFormButton.classList.add("hidden");
+}
+
+function hideBillForm() {
+  billForm.classList.add("hidden");
+  showBillFormButton.classList.remove("hidden");
+}
+
+function resetBillForm(options = {}) {
+  billForm.reset();
+  billId.value = "";
+  billFormTitle.textContent = "New rent, electricity, or wifi bill";
+  saveBillButton.textContent = "Save bill";
+  billForm.elements.namedItem("amount").value = "0";
+  billForm.elements.namedItem("status").value = "Unpaid";
+  setScopedMessage(billMessage, "");
+
+  if (options.hide !== false) {
+    hideBillForm();
+  }
+}
+
+function buildBillPayload(formData) {
+  return {
+    billType: textValue(formData, "billType"),
+    provider: emptyToNull(textValue(formData, "provider")),
+    amount: numberValue(formData, "amount"),
+    dueDate: emptyToNull(textValue(formData, "dueDate")),
+    paidDate: emptyToNull(textValue(formData, "paidDate")),
+    status: textValue(formData, "status"),
+    notes: emptyToNull(textValue(formData, "notes")),
+    updatedAt: serverTimestamp()
+  };
+}
+
+function fillBillForm(bill) {
+  showBillForm();
+  billId.value = bill.id;
+  billFormTitle.textContent = `Edit ${bill.billType || "bill"}`;
+  saveBillButton.textContent = "Update bill";
+
+  ["billType", "provider", "amount", "dueDate", "paidDate", "status", "notes"].forEach((name) => {
+    const field = billForm.elements.namedItem(name);
+    if (field) {
+      field.value = bill[name] ?? "";
+    }
+  });
+
+  billForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function getBillSearchText(bill) {
+  return [
+    bill.billType,
+    bill.provider,
+    bill.status,
+    bill.notes
+  ].join(" ").toLowerCase();
+}
+
+function renderExpenseSummary() {
+  const generalTotal = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+  const recurringTotal = recurringBills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
+  const unpaidCount = recurringBills.filter((bill) => bill.status !== "Paid").length;
+
+  expenseCount.textContent = String(expenses.length);
+  expenseTotal.textContent = moneyFormatter.format(generalTotal);
+  billTotal.textContent = moneyFormatter.format(recurringTotal);
+  unpaidBillCount.textContent = String(unpaidCount);
+}
+
+function renderExpenses() {
+  const term = expenseSearch.value.trim().toLowerCase();
+  const visibleExpenses = term
+    ? expenses.filter((expense) => getExpenseSearchText(expense).includes(term))
+    : expenses;
+
+  renderExpenseSummary();
+
+  if (!visibleExpenses.length) {
+    expensesTableBody.innerHTML = `
+      <tr>
+        <td colspan="7">${term ? "No matching expenses found." : "No expenses yet."}</td>
+      </tr>
+    `;
+    return;
+  }
+
+  expensesTableBody.innerHTML = visibleExpenses.map((expense) => `
+    <tr>
+      <td>
+        <strong>${escapeHtml(expense.expenseName || "")}</strong>
+        <span>${escapeHtml(expense.notes || "No notes")}</span>
+      </td>
+      <td>${escapeHtml(expense.category || "")}</td>
+      <td>${moneyFormatter.format(expense.amount || 0)}</td>
+      <td>${expense.expenseDate ? escapeHtml(expense.expenseDate) : formatDate(expense.createdAt)}</td>
+      <td>${escapeHtml(expense.vendor || "No vendor")}</td>
+      <td>${escapeHtml(expense.paymentMethod || "No method")}</td>
+      <td>
+        <div class="row-actions">
+          <button type="button" data-action="edit-expense" data-id="${expense.id}">Edit</button>
+          <button type="button" data-action="delete-expense" data-id="${expense.id}">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function renderBills() {
+  const term = billSearch.value.trim().toLowerCase();
+  const visibleBills = term
+    ? recurringBills.filter((bill) => getBillSearchText(bill).includes(term))
+    : recurringBills;
+
+  renderExpenseSummary();
+
+  if (!visibleBills.length) {
+    billsTableBody.innerHTML = `
+      <tr>
+        <td colspan="7">${term ? "No matching bills found." : "No rent, electricity, or wifi bills yet."}</td>
+      </tr>
+    `;
+    return;
+  }
+
+  billsTableBody.innerHTML = visibleBills.map((bill) => `
+    <tr>
+      <td>
+        <strong>${escapeHtml(bill.billType || "")}</strong>
+        <span>${escapeHtml(bill.notes || "No notes")}</span>
+      </td>
+      <td>${escapeHtml(bill.provider || "No provider")}</td>
+      <td>${moneyFormatter.format(bill.amount || 0)}</td>
+      <td>${escapeHtml(bill.dueDate || "No due date")}</td>
+      <td>${escapeHtml(bill.paidDate || "Not paid")}</td>
+      <td><span class="status-pill">${escapeHtml(bill.status || "Unpaid")}</span></td>
+      <td>
+        <div class="row-actions">
+          <button type="button" data-action="edit-bill" data-id="${bill.id}">Edit</button>
+          <button type="button" data-action="delete-bill" data-id="${bill.id}">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
 }
 
 function showForm() {
@@ -723,6 +1130,81 @@ function listenForRepairs() {
   );
 }
 
+function listenForStocks() {
+  if (unsubscribeStocks) {
+    unsubscribeStocks();
+  }
+
+  const stocksQuery = query(stocksCollection, orderBy("updatedAt", "desc"));
+  unsubscribeStocks = onSnapshot(
+    stocksQuery,
+    (snapshot) => {
+      stocks = snapshot.docs.map((stockDoc) => ({
+        id: stockDoc.id,
+        ...stockDoc.data()
+      }));
+      renderStocks();
+    },
+    (error) => {
+      stocksTableBody.innerHTML = `
+        <tr>
+          <td colspan="8">Unable to load stocks: ${escapeHtml(error.message)}</td>
+        </tr>
+      `;
+    }
+  );
+}
+
+function listenForExpenses() {
+  if (unsubscribeExpenses) {
+    unsubscribeExpenses();
+  }
+
+  const expensesQuery = query(expensesCollection, orderBy("updatedAt", "desc"));
+  unsubscribeExpenses = onSnapshot(
+    expensesQuery,
+    (snapshot) => {
+      expenses = snapshot.docs.map((expenseDoc) => ({
+        id: expenseDoc.id,
+        ...expenseDoc.data()
+      }));
+      renderExpenses();
+    },
+    (error) => {
+      expensesTableBody.innerHTML = `
+        <tr>
+          <td colspan="7">Unable to load expenses: ${escapeHtml(error.message)}</td>
+        </tr>
+      `;
+    }
+  );
+}
+
+function listenForRecurringBills() {
+  if (unsubscribeRecurringBills) {
+    unsubscribeRecurringBills();
+  }
+
+  const billsQuery = query(recurringBillsCollection, orderBy("updatedAt", "desc"));
+  unsubscribeRecurringBills = onSnapshot(
+    billsQuery,
+    (snapshot) => {
+      recurringBills = snapshot.docs.map((billDoc) => ({
+        id: billDoc.id,
+        ...billDoc.data()
+      }));
+      renderBills();
+    },
+    (error) => {
+      billsTableBody.innerHTML = `
+        <tr>
+          <td colspan="7">Unable to load bills: ${escapeHtml(error.message)}</td>
+        </tr>
+      `;
+    }
+  );
+}
+
 repairForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   setMessage("");
@@ -751,6 +1233,96 @@ repairForm.addEventListener("submit", async (event) => {
     setMessage(`Unable to save repair: ${error.message}`);
   } finally {
     saveRepairButton.disabled = false;
+  }
+});
+
+stockForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setScopedMessage(stockMessage, "");
+  saveStockButton.disabled = true;
+
+  const formData = new FormData(stockForm);
+  const editingId = stockId.value;
+  const payload = buildStockPayload(formData);
+
+  try {
+    if (editingId) {
+      await updateDoc(doc(db, "stocks", editingId), payload);
+      resetStockForm();
+      setScopedMessage(stockMessage, "Stock item updated.", "success");
+    } else {
+      await addDoc(stocksCollection, {
+        ...payload,
+        createdBy: currentUser?.uid || null,
+        createdAt: serverTimestamp()
+      });
+      resetStockForm();
+      setScopedMessage(stockMessage, "Stock item saved.", "success");
+    }
+  } catch (error) {
+    setScopedMessage(stockMessage, `Unable to save stock item: ${error.message}`);
+  } finally {
+    saveStockButton.disabled = false;
+  }
+});
+
+expenseForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setScopedMessage(expenseMessage, "");
+  saveExpenseButton.disabled = true;
+
+  const formData = new FormData(expenseForm);
+  const editingId = expenseId.value;
+  const payload = buildExpensePayload(formData);
+
+  try {
+    if (editingId) {
+      await updateDoc(doc(db, "expenses", editingId), payload);
+      resetExpenseForm();
+      setScopedMessage(expenseMessage, "Expense updated.", "success");
+    } else {
+      await addDoc(expensesCollection, {
+        ...payload,
+        createdBy: currentUser?.uid || null,
+        createdAt: serverTimestamp()
+      });
+      resetExpenseForm();
+      setScopedMessage(expenseMessage, "Expense saved.", "success");
+    }
+  } catch (error) {
+    setScopedMessage(expenseMessage, `Unable to save expense: ${error.message}`);
+  } finally {
+    saveExpenseButton.disabled = false;
+  }
+});
+
+billForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setScopedMessage(billMessage, "");
+  saveBillButton.disabled = true;
+
+  const formData = new FormData(billForm);
+  const editingId = billId.value;
+  const payload = buildBillPayload(formData);
+
+  try {
+    if (editingId) {
+      await updateDoc(doc(db, "recurringBills", editingId), payload);
+      resetBillForm();
+      setScopedMessage(billMessage, "Bill updated.", "success");
+    } else {
+      await addDoc(recurringBillsCollection, {
+        ...payload,
+        createdBy: currentUser?.uid || null,
+        createdAt: serverTimestamp()
+      });
+      resetBillForm();
+      setScopedMessage(billMessage, "Bill saved.", "success");
+    }
+  } catch (error) {
+    setScopedMessage(billMessage, `Unable to save bill: ${error.message}`);
+  } finally {
+    saveBillButton.disabled = false;
   }
 });
 
@@ -809,12 +1381,117 @@ repairsTableBody.addEventListener("click", async (event) => {
   }
 });
 
+stocksTableBody.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+
+  const selectedStock = stocks.find((stock) => stock.id === button.dataset.id);
+  if (!selectedStock) {
+    return;
+  }
+
+  if (button.dataset.action === "edit-stock") {
+    fillStockForm(selectedStock);
+    return;
+  }
+
+  if (button.dataset.action === "delete-stock") {
+    const confirmed = window.confirm(`Delete ${selectedStock.itemName || "this stock item"}? This cannot be undone.`);
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteDoc(doc(db, "stocks", selectedStock.id));
+    if (stockId.value === selectedStock.id) {
+      resetStockForm();
+    }
+  }
+});
+
+expensesTableBody.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+
+  const selectedExpense = expenses.find((expense) => expense.id === button.dataset.id);
+  if (!selectedExpense) {
+    return;
+  }
+
+  if (button.dataset.action === "edit-expense") {
+    fillExpenseForm(selectedExpense);
+    return;
+  }
+
+  if (button.dataset.action === "delete-expense") {
+    const confirmed = window.confirm(`Delete ${selectedExpense.expenseName || "this expense"}? This cannot be undone.`);
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteDoc(doc(db, "expenses", selectedExpense.id));
+    if (expenseId.value === selectedExpense.id) {
+      resetExpenseForm();
+    }
+  }
+});
+
+billsTableBody.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+
+  const selectedBill = recurringBills.find((bill) => bill.id === button.dataset.id);
+  if (!selectedBill) {
+    return;
+  }
+
+  if (button.dataset.action === "edit-bill") {
+    fillBillForm(selectedBill);
+    return;
+  }
+
+  if (button.dataset.action === "delete-bill") {
+    const confirmed = window.confirm(`Delete ${selectedBill.billType || "this bill"}? This cannot be undone.`);
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteDoc(doc(db, "recurringBills", selectedBill.id));
+    if (billId.value === selectedBill.id) {
+      resetBillForm();
+    }
+  }
+});
+
 showRepairFormButton.addEventListener("click", () => {
   resetForm({ hide: false });
   showForm();
 });
 cancelEditButton.addEventListener("click", resetForm);
 repairSearch.addEventListener("input", renderRepairs);
+showStockFormButton.addEventListener("click", () => {
+  resetStockForm({ hide: false });
+  showStockForm();
+});
+cancelStockEditButton.addEventListener("click", resetStockForm);
+stockSearch.addEventListener("input", renderStocks);
+showExpenseFormButton.addEventListener("click", () => {
+  resetExpenseForm({ hide: false });
+  showExpenseForm();
+});
+cancelExpenseEditButton.addEventListener("click", resetExpenseForm);
+expenseSearch.addEventListener("input", renderExpenses);
+showBillFormButton.addEventListener("click", () => {
+  resetBillForm({ hide: false });
+  showBillForm();
+});
+cancelBillEditButton.addEventListener("click", resetBillForm);
+billSearch.addEventListener("input", renderBills);
 customerSearch.addEventListener("input", renderCustomers);
 reportPeriod.addEventListener("change", renderReports);
 customersTableBody.addEventListener("click", (event) => {
@@ -841,16 +1518,40 @@ onAuthStateChanged(auth, (user) => {
 
   if (user) {
     listenForRepairs();
+    listenForStocks();
+    listenForExpenses();
+    listenForRecurringBills();
     return;
   }
 
   repairs = [];
+  stocks = [];
+  expenses = [];
+  recurringBills = [];
   resetForm();
+  resetStockForm();
+  resetExpenseForm();
+  resetBillForm();
+  renderStocks();
+  renderExpenses();
+  renderBills();
   renderCustomers();
   renderDashboard();
   renderReports();
   if (unsubscribeRepairs) {
     unsubscribeRepairs();
     unsubscribeRepairs = null;
+  }
+  if (unsubscribeStocks) {
+    unsubscribeStocks();
+    unsubscribeStocks = null;
+  }
+  if (unsubscribeExpenses) {
+    unsubscribeExpenses();
+    unsubscribeExpenses = null;
+  }
+  if (unsubscribeRecurringBills) {
+    unsubscribeRecurringBills();
+    unsubscribeRecurringBills = null;
   }
 });
