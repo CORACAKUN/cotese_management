@@ -1,0 +1,45 @@
+Deploy only Hosting
+
+If you only changed the website (HTML/CSS/JS) and didn't modify Firestore rules or Storage rules, you can deploy faster:
+
+firebase deploy --only hosting
+
+This is the command you'll probably use most often.
+
+If you changed Firestore Rules
+
+Deploy only the rules:
+
+firebase deploy --only firestore:rules
+If you changed Firestore Indexes
+
+Deploy only the indexes:
+
+firebase deploy --only firestore:indexes
+If you changed Storage Rules
+
+Deploy only Storage rules:
+
+firebase deploy --only storage
+Your daily workflow
+
+As you develop your business management system, it'll usually be:
+
+# Make code changes
+# Save files
+
+firebase deploy --only hosting
+
+Refresh your browser, and your updates will be live.
+
+Tip for faster development
+
+During development, you don't need to deploy after every change. You can preview your site locally:
+
+firebase serve
+
+or, if you later switch to Vite:
+
+npm run dev
+
+Then only run firebase deploy --only hosting when you're ready to publish your latest changes to the live site.
